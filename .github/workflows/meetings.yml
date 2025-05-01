@@ -20,25 +20,44 @@ jobs:
 
     - name: create discussion
       run: |
-        team_id=$(gh api graphql -f query='{ organization(login: "jabraham17") { team(slug: "chapel-ci-testing") { id } } }')
-        body=$(jq -n --arg text "${{ env.agenda_body }}" '{$text}')
+        repositoryId=$(gh api graphql
+          -f query='{ repository(owner: "${{ env.owner }}",
+                      name: "${{ env.repo_name }}") { id } }'
+          | jq -r '.data.repository.id')
 
-        QUERY='mutation {
-          createTeamDiscussion(input: {
-            teamId: "'$team_id'",
-            title: "Chapel project meeting: agenda items for '"${{ env.next_meeting_date }}"'",
-            body: $body
+        categoryId=$(gh api graphql
+          -f query='{ repository(owner: "${{ env.owner }}",
+                      name: "${{ env.repo_name }}")
+                      { discussionCategories(first: 10) { nodes { id, name} } } }'
+          | jq -r '.data.repository.discussionCategories.nodes | .[] | select(.name=="${{ env.category_name }}") | .id')
+
+        body=$(jq -n --arg text "${{ env.agenda_body }}" '{$text}')
+        title="Chapel project meeting: agenda items for ${{ env.next_meeting_date }}"
+
+        QUERY='mutation() {
+          createDiscussion(input: {
+            repositoryId: "$repositoryId",
+            categoryId: "$categoryId",
+            title: "$title",
+            body: "$body"
           }) {
-            teamDiscussion {
+            discussion {
               id
-              url
             }
           }
         }'
-        gh api graphql -f query="$QUERY" -f body="$body"
+        gh api graphql
+          -f query="$QUERY"
+          -f repositoryId="$repositoryId"
+          -f categoryId="$categoryId"
+          -f title="$title"
+          -f body="$body"
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           next_meeting_date: ${{ env.next_meeting_date }}
+          owner: "jabraham17"
+          repo_name: "chapel-ci-testing"
+          category_name: "Meetings"
           agenda_body: |
             This discussion is intended as a place for Chapel community members to propose agenda items for the weekly Chapel meeting on ${{ env.next_meeting_date }}.  Potential categories for items include:
             * **News:** Quick updates or announcements to keep people in the loop on key efforts or topics
