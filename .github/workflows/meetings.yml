@@ -20,9 +20,12 @@ jobs:
 
     - name: create discussion
       run: |
+        team_id=$(gh api graphql -f query='{ organization(login: "jabraham17") { team(slug: "chapel-ci-testing") { id } } }')
+        body=$(jq -n --arg text "${{ env.agenda_body }}" '{$text}')
+
         QUERY='mutation {
           createTeamDiscussion(input: {
-            teamId: "T_kwDOLb8lec4CZXIu",
+            teamId: "'$team_id'",
             title: "Chapel project meeting: agenda items for '"${{ env.next_meeting_date }}"'",
             body: $body
           }) {
@@ -32,7 +35,6 @@ jobs:
             }
           }
         }'
-        body=$(jq -n --arg text "${{ env.agenda_body }}" '{$text}')
         gh api graphql -f query="$QUERY" -f body="$body"
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
