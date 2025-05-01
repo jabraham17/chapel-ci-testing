@@ -21,13 +21,11 @@ jobs:
     - name: create discussion
       run: |
         repositoryId=$(gh api graphql \
-          -H 'Authorization: token ${{ secrets.PERSONAL_TOKEN }}' \
           -f query='{ repository(owner: "${{ env.owner }}",
                       name: "${{ env.repo_name }}") { id } }' \
           | jq -r '.data.repository.id')
 
         categoryId=$(gh api graphql \
-          -H 'Authorization: token ${{ secrets.PERSONAL_TOKEN }}' \
           -f query='{ repository(owner: "${{ env.owner }}",
                       name: "${{ env.repo_name }}")
                       { discussionCategories(first: 10) { nodes { id, name} } } }' \
@@ -36,12 +34,12 @@ jobs:
         body=$(jq -n --arg text "${{ env.agenda_body }}" '{$text}')
         title="Chapel project meeting: agenda items for ${{ env.next_meeting_date }}"
 
-        QUERY='mutation() {
+        QUERY='mutation($repositoryId: ID!, $categoryId: ID!, $title: String!, $body: String!) {
           createDiscussion(input: {
-            repositoryId: "$repositoryId",
-            categoryId: "$categoryId",
-            title: "$title",
-            body: "$body"
+            repositoryId: $repositoryId,
+            categoryId: $categoryId,
+            title: $title,
+            body: $body
           }) {
             discussion {
               id
@@ -49,15 +47,13 @@ jobs:
           }
         }'
         gh api graphql \
-          -H 'Authorization: token ${{ secrets.PERSONAL_TOKEN }}' \
-          -f query="$QUERY" \
-          -F repositoryId="$repositoryId" \
-          -F categoryId="$categoryId" \
-          -F title="$title" \
-          -F body="$body"
+          -f repositoryId="$repositoryId" \
+          -f categoryId="$categoryId" \
+          -f title="$title" \
+          -f body="$body" \
+          -f query="$QUERY"
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
           next_meeting_date: ${{ env.next_meeting_date }}
           owner: "jabraham17"
           repo_name: "chapel-ci-testing"
