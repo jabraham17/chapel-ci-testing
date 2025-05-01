@@ -6,9 +6,19 @@ on:
     - cron: '0 18 * * 2' # Runs every week on Tuesday at 11 PT
 
 jobs:
-  check-and-update:
+  create-discussion:
+    name: Create Weekly Discussion
+
     if: github.repository == 'jabraham17/chapel-ci-testing'
+    permissions:
+      discussions: write
+      contents: read
     runs-on: ubuntu-latest
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      owner: "jabraham17"
+      repo_name: "chapel-ci-testing"
 
     steps:
     - name: compute date
@@ -55,8 +65,8 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           next_meeting_date: ${{ env.next_meeting_date }}
-          owner: "jabraham17"
-          repo_name: "chapel-ci-testing"
+          owner: ${{ env.owner }}
+          repo_name: ${{ env.repo_name }}
           category_name: "Meetings"
           agenda_body: |
             This discussion is intended as a place for Chapel community members to propose agenda items for the weekly Chapel meeting on ${{ env.next_meeting_date }}.  Potential categories for items include:
