@@ -21,11 +21,13 @@ jobs:
     - name: create discussion
       run: |
         repositoryId=$(gh api graphql \
+          -H 'Authorization: token ${{ secrets.PERSONAL_TOKEN }}' \
           -f query='{ repository(owner: "${{ env.owner }}",
                       name: "${{ env.repo_name }}") { id } }' \
           | jq -r '.data.repository.id')
 
         categoryId=$(gh api graphql \
+          -H 'Authorization: token ${{ secrets.PERSONAL_TOKEN }}' \
           -f query='{ repository(owner: "${{ env.owner }}",
                       name: "${{ env.repo_name }}")
                       { discussionCategories(first: 10) { nodes { id, name} } } }' \
@@ -47,6 +49,7 @@ jobs:
           }
         }'
         gh api graphql \
+          -H 'Authorization: token ${{ secrets.PERSONAL_TOKEN }}' \
           -f query="$QUERY" \
           -f repositoryId="$repositoryId" \
           -f categoryId="$categoryId" \
@@ -54,6 +57,7 @@ jobs:
           -f body="$body"
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
           next_meeting_date: ${{ env.next_meeting_date }}
           owner: "jabraham17"
           repo_name: "chapel-ci-testing"
