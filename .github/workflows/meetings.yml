@@ -41,7 +41,7 @@ jobs:
                       { discussionCategories(first: 10) { nodes { id, name} } } }' \
           | jq -r '.data.repository.discussionCategories.nodes | .[] | select(.name=="${{ env.category_name }}") | .id')
 
-        body=$(jq -n --arg text "${{ env.agenda_body }}" '{$text}')
+        body="${{ env.agenda_body }}"
         title="Chapel project meeting: agenda items for ${{ env.next_meeting_date }}"
 
         QUERY='mutation($repositoryId: ID!, $categoryId: ID!, $title: String!, $body: String!) {
