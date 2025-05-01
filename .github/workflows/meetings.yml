@@ -20,12 +20,12 @@ jobs:
 
     - name: create discussion
       run: |
-        repositoryId=$(gh api graphql
+        repositoryId=$(gh api graphql \
           -f query='{ repository(owner: "${{ env.owner }}",
                       name: "${{ env.repo_name }}") { id } }' \
           | jq -r '.data.repository.id')
 
-        categoryId=$(gh api graphql
+        categoryId=$(gh api graphql \
           -f query='{ repository(owner: "${{ env.owner }}",
                       name: "${{ env.repo_name }}")
                       { discussionCategories(first: 10) { nodes { id, name} } } }' \
@@ -46,11 +46,11 @@ jobs:
             }
           }
         }'
-        gh api graphql
-          -f query="$QUERY"
-          -f repositoryId="$repositoryId"
-          -f categoryId="$categoryId"
-          -f title="$title"
+        gh api graphql \
+          -f query="$QUERY" \
+          -f repositoryId="$repositoryId" \
+          -f categoryId="$categoryId" \
+          -f title="$title" \
           -f body="$body"
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
