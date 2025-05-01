@@ -7,7 +7,7 @@ on:
 
 jobs:
   check-and-update:
-    if: github.repository == 'chapel-lang/chapel'
+    if: github.repository == 'jabraham17/chapel-ci-testing'
     runs-on: ubuntu-latest
 
     steps:
