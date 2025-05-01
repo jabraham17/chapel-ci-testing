@@ -51,10 +51,10 @@ jobs:
         gh api graphql \
           -H 'Authorization: token ${{ secrets.PERSONAL_TOKEN }}' \
           -f query="$QUERY" \
-          -f repositoryId="$repositoryId" \
-          -f categoryId="$categoryId" \
-          -f title="$title" \
-          -f body="$body"
+          -F repositoryId="$repositoryId" \
+          -F categoryId="$categoryId" \
+          -F title="$title" \
+          -F body="$body"
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
