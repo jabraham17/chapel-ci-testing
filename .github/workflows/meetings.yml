@@ -18,13 +18,13 @@ jobs:
         echo "next_meeting_date=$date" >> $GITHUB_ENV
       shell: bash
 
-    - name: create pull request
+    - name: create discussion
       run: >
-        gh api
-          --method POST
-          -H "Accept: application/vnd.github+json"
-          -H "X-GitHub-Api-Version: 2022-11-28"
-          /orgs/chapel-lang/teams/chapel/discussions
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /orgs/jabraham17/teams/chapel-ci-testing/discussions \
           -f "title=Chapel project meeting: agenda items for ${{ env.next_meeting_date }}" -f "body='${{ env.agenda_body }}'"
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
