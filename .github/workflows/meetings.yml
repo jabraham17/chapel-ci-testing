@@ -19,13 +19,21 @@ jobs:
       shell: bash
 
     - name: create discussion
-      run: >
-        gh api \
-          --method POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          /orgs/jabraham17/teams/chapel-ci-testing/discussions \
-          -f "title=Chapel project meeting: agenda items for ${{ env.next_meeting_date }}" -f "body='hello world'"
+      run: |
+        QUERY='mutation {
+          createTeamDiscussion(input: {
+            teamId: "T_kwDOLb8lec4CZXIu",
+            title: "Chapel project meeting: agenda items for '"${{ env.next_meeting_date }}"'",
+            body: $body
+          }) {
+            teamDiscussion {
+              id
+              url
+            }
+          }
+        }'
+        body=$(jq -n --arg text "${{ env.agenda_body }}" '{$text}')
+        gh api graphql -f query="$QUERY" -f body="$body"
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           next_meeting_date: ${{ env.next_meeting_date }}
