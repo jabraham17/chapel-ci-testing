@@ -22,7 +22,7 @@ git clone -n --depth=1 --filter=tree:0 \
 pushd chapel-sparse
 git sparse-checkout set --no-cone /util /third-party/chpl-venv
 git checkout
-popd ..
+popd
 mv $temp_dir/chapel-sparse/util $outdir
 mv $temp_dir/chapel-sparse/third-party/chpl-venv/test-requirements.txt $outdir
 rm -rf chapel-sparse
