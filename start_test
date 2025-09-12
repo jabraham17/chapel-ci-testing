@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+TEST_DRIVER_DIR=$(cd "$(dirname "$0")" && pwd)
+export CHPL_HOME=$(chpl --print-chpl-home)
+exec $TEST_DRIVER_DIR/venv/bin/python3 $TEST_DRIVER_DIR/util/start_test.py "$@"
