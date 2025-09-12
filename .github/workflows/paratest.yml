@@ -6,7 +6,9 @@ on:
     branches:
       - main
 
-
+concurrency:
+  group: paratest-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build-chapel:
