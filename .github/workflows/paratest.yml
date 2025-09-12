@@ -66,6 +66,7 @@ jobs:
           git clone -n --depth=1 --filter=tree:0 -b main --single-branch https://github.com/chapel-lang/chapel.git /opt/tests
           cd /opt/tests
           git sparse-checkout set --no-cone /test
+          git checkout
           mv /opt/tests/test/* /opt/tests
           rmdir /opt/tests/test
       - name: Upload tests
