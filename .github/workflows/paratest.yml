@@ -44,7 +44,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run get_start_test
         run: |
-          ./get_start_test /opt/start_test
+          mkdir -p /opt/start_test
+          ./get_start_test.sh /opt/start_test
       - name: Add driver script
         run: |
           cp start_test /opt/start_test/start_test
@@ -60,6 +61,7 @@ jobs:
     steps:
       - name: Get all Chapel tests
         run: |
+          mkdir -p /opt/tests
           git clone -n --depth=1 --filter=tree:0 -b main --single-branch https://github.com/chapel-lang/chapel.git /opt/tests
           cd /opt/tests
           git sparse-checkout set --no-cone /test
@@ -80,6 +82,16 @@ jobs:
       with:
         name: chapel
         path: /opt/chapel
+    - name: Download start_test
+      uses: actions/download-artifact@v4
+      with:
+        name: start_test
+        path: /opt/start_test
+    - name: Download tests
+      uses: actions/download-artifact@v4
+      with:
+        name: tests
+        path: /opt/tests
     - name: Run paratest
       run: |
         export PATH=/opt/chapel/bin:$PATH
