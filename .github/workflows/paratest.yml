@@ -15,10 +15,9 @@ jobs:
         git clone https://github.com/chapel-lang/chapel.git --depth 1 --branch main
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install gcc g++ m4 perl python3 python3-dev bash make mawk git pkg-config cmake
-        sudo apt-get install llvm-dev llvm clang libclang-dev libclang-cpp-dev libedit-dev
-
+        sudo apt-get update -y
+        sudo apt-get install -y gcc g++ m4 perl python3 python3-dev bash make mawk git pkg-config cmake
+        sudo apt-get install -y llvm-dev llvm clang libclang-dev libclang-cpp-dev libedit-dev
     - name: Build and Install Chapel
       run: |
         mkdir /opt/chapel
@@ -31,7 +30,7 @@ jobs:
         export PATH=/opt/chapel/bin:$PATH
         make check
     - name: Save Chapel
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: chapel
         path: /opt/chapel
@@ -48,7 +47,7 @@ jobs:
           cp start_test /opt/start_test/start_test
           chmod +x /opt/start_test/start_test
       - name: Upload
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: start_test
           path: /opt/start_test
@@ -64,7 +63,7 @@ jobs:
           mv /opt/tests/test/* /opt/tests
           rmdir /opt/tests/test
       - name: Upload tests
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: tests
           path: /opt/tests
@@ -74,7 +73,7 @@ jobs:
     needs: [build-chapel, setup-start-test, download-tests]
     steps:
     - name: Download Chapel
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: chapel
         path: /opt/chapel
