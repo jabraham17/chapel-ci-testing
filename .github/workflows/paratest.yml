@@ -34,11 +34,14 @@ jobs:
         cd chapel
         export PATH=/opt/chapel/bin:$PATH
         make check
+    - name: Tar
+      run: |
+        tar -cvf chapel.tar /opt/chapel
     - name: Save Chapel
       uses: actions/upload-artifact@v4
       with:
         name: chapel
-        path: /opt/chapel
+        path: chapel.tar
   setup-start-test:
     name: Setup start_test
     runs-on: ubuntu-latest
@@ -52,26 +55,39 @@ jobs:
         run: |
           cp start_test /opt/start_test/start_test
           chmod +x /opt/start_test/start_test
+      - name: Tar
+        run: |
+          tar -cvf start_test.tar /opt/start_test
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: start_test
-          path: /opt/start_test
+          path: start_test.tar
+
   paratest:
     name: Run paratest
     runs-on: ubuntu-latest
     needs: [build-chapel, setup-start-test]
     steps:
+      # TODO: should we just build images instead of this artifact nonsense?
     - name: Download Chapel
       uses: actions/download-artifact@v4
       with:
         name: chapel
-        path: /opt/chapel
+        path: chapel.tar
+    - name: Extract Chapel
+      run: |
+        mkdir -p /opt/chapel
+        tar -xvf chapel.tar -C /opt/chapel --strip-components=1
     - name: Download start_test
       uses: actions/download-artifact@v4
       with:
         name: start_test
-        path: /opt/start_test
+        path: start_test.tar
+    - name: Extract start_test
+      run: |
+        mkdir -p /opt/start_test
+        tar -xvf start_test.tar -C /opt/start_test --strip-components=1
     - name: Download tests
       run: |
         mkdir -p /opt/tests
