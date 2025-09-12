@@ -56,24 +56,6 @@ jobs:
         with:
           name: start_test
           path: /opt/start_test
-  download-tests:
-    name: Download tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get all Chapel tests
-        run: |
-          mkdir -p /opt/tests
-          git clone -n --depth=1 --filter=tree:0 -b main --single-branch https://github.com/chapel-lang/chapel.git /opt/tests
-          cd /opt/tests
-          git sparse-checkout set --no-cone /test
-          git checkout
-          mv /opt/tests/test/* /opt/tests
-          rmdir /opt/tests/test
-      - name: Upload tests
-        uses: actions/upload-artifact@v4
-        with:
-          name: tests
-          path: /opt/tests
   paratest:
     name: Run paratest
     runs-on: ubuntu-latest
@@ -90,10 +72,14 @@ jobs:
         name: start_test
         path: /opt/start_test
     - name: Download tests
-      uses: actions/download-artifact@v4
-      with:
-        name: tests
-        path: /opt/tests
+      run: |
+        mkdir -p /opt/tests
+        git clone -n --depth=1 --filter=tree:0 -b main --single-branch https://github.com/chapel-lang/chapel.git /opt/tests
+        cd /opt/tests
+        git sparse-checkout set --no-cone /test
+        git checkout
+        mv /opt/tests/test/* /opt/tests
+        rm -rf /opt/tests/test
     - name: Run paratest
       run: |
         export PATH=/opt/chapel/bin:$PATH
