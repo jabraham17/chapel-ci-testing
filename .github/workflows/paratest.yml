@@ -59,7 +59,7 @@ jobs:
   paratest:
     name: Run paratest
     runs-on: ubuntu-latest
-    needs: [build-chapel, setup-start-test, download-tests]
+    needs: [build-chapel, setup-start-test]
     steps:
     - name: Download Chapel
       uses: actions/download-artifact@v4
