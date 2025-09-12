@@ -27,7 +27,7 @@ jobs:
         mkdir /opt/chapel
         cd chapel
         ./configure --prefix=/opt/chapel
-        make -j
+        make -j`nproc`
         make install
     - name: Verify Chapel installation
       run: |
