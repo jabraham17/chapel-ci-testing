@@ -2,9 +2,6 @@ name: paratest linux64
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 concurrency:
   group: paratest-${{ github.ref }}
