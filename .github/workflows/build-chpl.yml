@@ -31,6 +31,6 @@ jobs:
         file: Dockerfile
         context: .
         push: true
-        tags: ${{ github.repository }}/chapel:latest
+        tags: ghcr.io/${{ github.repository }}/chapel:latest
         build-args: |
           PARALLEL=${{ steps.get_nproc.outputs.NPROC }}
