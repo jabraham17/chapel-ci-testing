@@ -3,9 +3,6 @@ name: Build CHPL
 on:
   workflow_dispatch:
 
-env:
-  IMAGE_NAME: ${{ github.repository }}/chapel
-
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
@@ -25,12 +22,15 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Get number of processors
+        id: get_nproc
+        run: echo "NPROC=$(nproc)" >> "$GITHUB_OUTPUT"
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
         file: Dockerfile
         context: .
         push: true
-        tags: ${{ env.IMAGE_NAME }}:latest
+        tags: ${{ github.repository }}/chapel:latest
         build-args: |
-          PARALLEL=$(nproc)
+          PARALLEL=${{ steps.get_nproc.outputs.NPROC }}
