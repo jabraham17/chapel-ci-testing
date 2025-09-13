@@ -1,4 +1,4 @@
-name: Build
+name: Build CHPL
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ env:
   IMAGE_NAME: ${{ github.repository }}/chapel
 
 concurrency:
-  group: paratest-${{ github.ref }}
+  group: build-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

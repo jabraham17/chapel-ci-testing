@@ -1,4 +1,4 @@
-name: paratest linux64
+name: paratest linux64 OLD
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
   #     - main
 
 concurrency:
-  group: paratest-${{ github.ref }}
+  group: paratest1-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   build-chapel:
