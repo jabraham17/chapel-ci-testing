@@ -12,7 +12,7 @@ WORKDIR /opt
 RUN git clone https://github.com/chapel-lang/chapel.git --depth 1 --branch main
 WORKDIR /opt/chapel
 ENV CHPL_HOME=/opt/chapel
-RUN make all test-venv -j${PARALLEL}
+RUN make all test-venv -j$PARALLEL
 RUN make check
 
 WORKDIR /opt/chapel
