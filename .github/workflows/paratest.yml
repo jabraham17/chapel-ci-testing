@@ -18,4 +18,4 @@ jobs:
     steps:
       - name: run tests
         run: |
-          ./util/start_test test/release/examples
+          $CHPL_HOME/util/start_test $CHPL_HOME/test/release/examples
