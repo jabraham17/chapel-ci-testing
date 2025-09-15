@@ -1,0 +1,75 @@
+name: paratest linux64
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: distrib-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  determine-test-directories:
+    name: Determine test directories
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/chapel:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      test-dirs-matrix: ${{ steps.determine-test-directories.outputs.test-dirs-matrix }}
+      test-dirs-list: ${{ steps.determine-test-directories.outputs.test-dirs-list }}
+    steps:
+      - name: determine test directories
+        run: |
+          # use -clean-only to get a list of all test directories without running tests
+          # then extract out the directory names that look like `test/something`,
+          # then remove the `test/` prefix to get just `something`. ignore subdirs like
+          # `test/something/else`.
+          $CHPL_HOME/util/start_test --clean-only -logfile cleanlog.txt
+          cat cleanlog.txt | grep '\[Working on directory' | CWD=`pwd` sed -E "s#\[Working on directory ${CWD}/?(.+)\]#\1#" | grep -E '^test/[^/]+$' | sed -E 's#^test/##' > testdirs.txt
+      - name: create matrix
+        id: determine-test-directories
+        run: |
+          # create a JSON matrix from the list of test directories
+          echo "::set-output name=test-dirs-matrix::{\"include\":["$(cat testdirs.txt | sed -E 's#^#{"dir":"#; s#$#"},#' | tr -d '\n' | sed -E 's#,$##')"]}"
+          # also output a comma-separated list of test directories for informational purposes
+          echo "::set-output name=test-dirs-list::"$(cat testdirs.txt | tr '\n' ',' | sed -E 's#,$##')
+
+  run-test-dir:
+    name: Run tests in directory ${{ matrix.dir }}
+    needs: determine-test-directories
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/chapel:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      matrix: ${{fromJson(needs.determine-test-directories.outputs.test-dirs-matrix)}}
+    steps:
+      - name: run tests
+        run: |
+          (cd test && $CHPL_HOME/util/test/paratest.local -dirs ${{ matrix.dir }} -logfile "results-${{ matrix.dir }}.txt")
+
+
+  aggregate-results:
+    name: Aggregate results
+    needs: [run-test-dir, determine-test-directories]
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/${{ github.repository }}/chapel:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: aggregate results
+        run: |
+          echo "Tested directories: ${{ needs.determine-test-directories.outputs.test-dirs-list }}"
+          # cat all the individual results files into one big results file
+          cat test/results-*.txt > test/aggregated-results.txt
+          # TODO: create a better summary of results
+      - name: upload results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: aggregated-results.txt
