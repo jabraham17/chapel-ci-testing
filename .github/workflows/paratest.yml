@@ -19,7 +19,7 @@ jobs:
       - name: run tests
         run: |
           # hack to workaround perl warning
-          sudo apt-get purge -y locales
-          sudo apt-get install -y locales
-          sudo dpkg-reconfigure locales
+          apt-get purge -y locales
+          apt-get install -y locales
+          dpkg-reconfigure locales
           $CHPL_HOME/util/start_test $CHPL_HOME/test/release/examples
