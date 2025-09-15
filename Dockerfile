@@ -16,7 +16,11 @@ RUN make all test-venv chpldoc chplcheck -j$PARALLEL
 RUN echo 'PATH=$CHPL_HOME/bin/$($CHPL_HOME/util/chplenv/chpl_bin_subdir.py):$PATH' >> ~/.bashrc
 RUN PATH=$CHPL_HOME/bin/$($CHPL_HOME/util/chplenv/chpl_bin_subdir.py):$PATH make check
 
-
+# hack to workaround perl warning
+RUN apt-get purge -y locales && apt-get install -y locales && \
+    locale-gen "en_US.UTF-8" && dpkg-reconfigure locales
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 WORKDIR /opt/chapel
 ENTRYPOINT [ "/bin/bash" ]
