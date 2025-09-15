@@ -1,4 +1,4 @@
-name: paratest linux64
+name: distrib paratest linux64
 
 on:
   workflow_dispatch:
