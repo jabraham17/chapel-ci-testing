@@ -12,7 +12,7 @@ WORKDIR /opt
 RUN git clone https://github.com/chapel-lang/chapel.git --depth 1 --branch main
 WORKDIR /opt/chapel
 ENV CHPL_HOME=/opt/chapel
-RUN make all test-venv -j$PARALLEL
+RUN make all test-venv chpldoc chplcheck -j$PARALLEL
 RUN echo 'PATH=$CHPL_HOME/bin/$($CHPL_HOME/util/chplenv/chpl_bin_subdir.py):$PATH' >> ~/.bashrc
 RUN PATH=$CHPL_HOME/bin/$($CHPL_HOME/util/chplenv/chpl_bin_subdir.py):$PATH make check
 
