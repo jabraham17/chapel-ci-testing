@@ -28,7 +28,7 @@ jobs:
           # then extract out the directory names that look like `test/something`,
           # then remove the `test/` prefix to get just `something`. ignore subdirs like
           # `test/something/else`.
-          $CHPL_HOME/util/start_test --clean-only -logfile cleanlog.txt
+          $CHPL_HOME/util/start_test $CHPL_HOME/test --clean-only -logfile cleanlog.txt
           cat cleanlog.txt | grep '\[Working on directory' | CWD=`pwd` sed -E "s#\[Working on directory ${CWD}/?(.+)\]#\1#" | grep -E '^test/[^/]+$' | sed -E 's#^test/##' > testdirs.txt
 
           # Debug: show what directories were found
