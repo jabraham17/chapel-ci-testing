@@ -31,7 +31,7 @@ jobs:
         id: determine-test-directories
         run: |
           # create a JSON matrix from the list of test directories
-          echo "::set-output name=test-dirs-matrix::{\"include\":["$(cat testdirs.txt | sed -E 's#^#{"dir":"#; s#$#"},#' | tr -d '\n' | sed -E 's#,$##')"]}"
+          echo "::set-output name=test-dirs-matrix::["$(cat testdirs.txt | sed -E 's#^#{"dir":"#; s#$#"},#' | tr -d '\n' | sed -E 's#,$##')"]"
           # also output a comma-separated list of test directories for informational purposes
           echo "::set-output name=test-dirs-list::"$(cat testdirs.txt | tr '\n' ',' | sed -E 's#,$##')
 
@@ -45,7 +45,8 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     strategy:
-      matrix: ${{fromJson(needs.determine-test-directories.outputs.test-dirs-matrix)}}
+      matrix:
+        dir: ${{ fromJson(needs.determine-test-directories.outputs.test-dirs-matrix) }}
     steps:
       - name: run tests
         run: |
