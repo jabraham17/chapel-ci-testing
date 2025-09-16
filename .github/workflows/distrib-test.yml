@@ -64,7 +64,7 @@ jobs:
     steps:
       - name: run tests
         run: |
-          (cd $$CHPL_HOME/test && $CHPL_HOME/util/test/paratest.local -dirs ${{ matrix.dir }} -logfile "results-${{ matrix.dir }}.txt")
+          (cd $CHPL_HOME/test && $CHPL_HOME/util/test/paratest.local -dirs ${{ matrix.dir }} -logfile "results-${{ matrix.dir }}.txt")
 
   aggregate-results:
     name: Aggregate results
