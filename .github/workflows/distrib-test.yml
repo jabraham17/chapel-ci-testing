@@ -30,13 +30,31 @@ jobs:
           # `test/something/else`.
           $CHPL_HOME/util/start_test --clean-only -logfile cleanlog.txt
           cat cleanlog.txt | grep '\[Working on directory' | CWD=`pwd` sed -E "s#\[Working on directory ${CWD}/?(.+)\]#\1#" | grep -E '^test/[^/]+$' | sed -E 's#^test/##' > testdirs.txt
+
+          # Debug: show what directories were found
+          echo "Found test directories:"
+          cat testdirs.txt
       - name: create matrix
         id: determine-test-directories
         run: |
+          # Check if testdirs.txt has any content
+          if [ ! -s testdirs.txt ]; then
+            echo "No test directories found!"
+            echo "test-dirs-matrix=[]" >> $GITHUB_OUTPUT
+            echo "test-dirs-list=" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
           # create a JSON matrix from the list of test directories
-          echo "::set-output name=test-dirs-matrix::["$(cat testdirs.txt | sed -E 's#^#"#; s#$#",#' | tr -d '\n' | sed -E 's#,$##')"]"
+          matrix="[\"$(cat testdirs.txt | tr '\n' ',' | sed -E 's#,$##' | sed -E 's#,#","#g')\"]"
+          echo "test-dirs-matrix=$matrix" >> $GITHUB_OUTPUT
+
           # also output a comma-separated list of test directories for informational purposes
-          echo "::set-output name=test-dirs-list::"$(cat testdirs.txt | tr '\n' ',' | sed -E 's#,$##')
+          list=$(cat testdirs.txt | tr '\n' ',' | sed -E 's#,$##')
+          echo "test-dirs-list=$list" >> $GITHUB_OUTPUT
+
+          # Debug: show the matrix that was created
+          echo "Created matrix: $matrix"
 
   run-test-dir:
     name: Run tests in directory ${{ matrix.dir }}
@@ -54,7 +72,6 @@ jobs:
       - name: run tests
         run: |
           (cd test && $CHPL_HOME/util/test/paratest.local -dirs ${{ matrix.dir }} -logfile "results-${{ matrix.dir }}.txt")
-
 
   aggregate-results:
     name: Aggregate results
@@ -76,4 +93,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-results
-          path: aggregated-results.txt
+          path: test/aggregated-results.txt
