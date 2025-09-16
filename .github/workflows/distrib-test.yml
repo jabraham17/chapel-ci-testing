@@ -91,10 +91,10 @@ jobs:
         run: |
           echo "Tested directories: ${{ needs.determine-test-directories.outputs.test-dirs-list }}"
           # cat all the individual results files into one big results file
-          cat test/results-*.txt > test/aggregated-results.txt
+          cat results-*.txt > aggregated-results.txt
           # TODO: create a better summary of results
       - name: upload results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: test/aggregated-results.txt
+          path: aggregated-results.txt
