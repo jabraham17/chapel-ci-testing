@@ -30,13 +30,6 @@ jobs:
           # `test/something/else`.
           $CHPL_HOME/util/start_test $CHPL_HOME/test --clean-only -logfile cleanlog.txt
           cat cleanlog.txt | grep '\[Working on directory' | sed -E "s#\[Working on directory ${CHPL_HOME}/?(.+)\]#\1#" | grep -E '^test/[^/]+$' | sed -E 's#^test/##' > testdirs.txt
-
-          # Debug: show what directories were found
-          echo "Found test directories:"
-          cat testdirs.txt
-
-          echo "cleanlog.txt contents:"
-          cat cleanlog.txt
       - name: create matrix
         id: determine-test-directories
         run: |
@@ -56,9 +49,6 @@ jobs:
           list=$(cat testdirs.txt | tr '\n' ',' | sed -E 's#,$##')
           echo "test-dirs-list=$list" >> $GITHUB_OUTPUT
 
-          # Debug: show the matrix that was created
-          echo "Created matrix: $matrix"
-
   run-test-dir:
     name: Run tests in directory ${{ matrix.dir }}
     needs: determine-test-directories
@@ -74,7 +64,7 @@ jobs:
     steps:
       - name: run tests
         run: |
-          (cd test && $CHPL_HOME/util/test/paratest.local -dirs ${{ matrix.dir }} -logfile "results-${{ matrix.dir }}.txt")
+          (cd $$CHPL_HOME/test && $CHPL_HOME/util/test/paratest.local -dirs ${{ matrix.dir }} -logfile "results-${{ matrix.dir }}.txt")
 
   aggregate-results:
     name: Aggregate results
