@@ -30,6 +30,13 @@ jobs:
           # `test/something/else`.
           $CHPL_HOME/util/start_test $CHPL_HOME/test --clean-only -logfile cleanlog.txt
           cat cleanlog.txt | grep '\[Working on directory' | sed -E "s#\[Working on directory ${CHPL_HOME}/?(.+)\]#\1#" | grep -E '^test/[^/]+$' | sed -E 's#^test/##' > testdirs.txt
+
+      - name: overwrite test dirs for debugging
+        if: true
+        run: |
+          echo "puzzles" > testdirs.txt
+          echo "hash" >> testdirs.txt
+
       - name: create matrix
         id: determine-test-directories
         run: |
