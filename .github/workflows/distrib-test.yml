@@ -65,6 +65,13 @@ jobs:
       - name: run tests
         run: |
           (cd $CHPL_HOME/test && $CHPL_HOME/util/test/paratest.local -dirs ${{ matrix.dir }} -logfile "results-${{ matrix.dir }}.txt")
+          mv $CHPL_HOME/test/results-${{ matrix.dir }}.txt results-${{ matrix.dir }}.txt
+      - name: upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.dir }}
+          path: results-${{ matrix.dir }}.txt
+
 
   aggregate-results:
     name: Aggregate results
@@ -76,6 +83,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - name: download results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results-*
       - name: aggregate results
         run: |
           echo "Tested directories: ${{ needs.determine-test-directories.outputs.test-dirs-list }}"
