@@ -34,6 +34,9 @@ jobs:
           # Debug: show what directories were found
           echo "Found test directories:"
           cat testdirs.txt
+
+          echo "cleanlog.txt contents:"
+          cat cleanlog.txt
       - name: create matrix
         id: determine-test-directories
         run: |
