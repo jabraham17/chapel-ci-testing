@@ -99,6 +99,7 @@ jobs:
           echo "Tested directories: ${{ needs.determine-test-directories.outputs.test-dirs-list }}"
           # cat all the individual results files into one big results file
           ls -l
+          ls -l test-results-hash
           cat test-results-*.txt > aggregated-results.txt
           # TODO: create a better summary of results
       - name: upload results
