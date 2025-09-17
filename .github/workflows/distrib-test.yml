@@ -94,6 +94,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: test-results-*
+          path: .
       - name: aggregate results
         run: |
           echo "Tested directories: ${{ needs.determine-test-directories.outputs.test-dirs-list }}"
