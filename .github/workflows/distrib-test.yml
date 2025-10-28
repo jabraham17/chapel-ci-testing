@@ -32,7 +32,7 @@ jobs:
           cat cleanlog.txt | grep '\[Working on directory' | sed -E "s#\[Working on directory ${CHPL_HOME}/?(.+)\]#\1#" | grep -E '^test/[^/]+$' | sed -E 's#^test/##' > testdirs.txt
 
       - name: overwrite test dirs for debugging
-        if: true
+        if: false
         run: |
           echo "puzzles" > testdirs.txt
           echo "hash" >> testdirs.txt
